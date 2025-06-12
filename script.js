@@ -12,10 +12,10 @@ const CONFIG = {
         waitTime: 8000
     },
     people: {
-        maxCount: 100000500, // Hundreds of LilChogs
+        maxCount: 100000500, // Hundreds of Monanimals
         spawnRate: 0.3,
         walkSpeed: 2.5,
-        returnSpeed: 1.5
+        returnSpeed: 2.0
     },
     environment: {
         windStrength: 0.5,
@@ -113,25 +113,31 @@ const WEATHER_TYPES = {
     }
 };
 
-// Lilchog Character Data (Enhanced)
-const LILCHOG_SPRITES = {
-    body: {
-        radius: 12,
-        color: '#F5F5DC',
-        spikes: 8
-    },
-    face: {
-        eyeSize: 4,
-        eyeColor: '#000',
-        eyeHighlight: '#FFF',
-        cheekColor: '#FFB6C1',
-        smileColor: '#8B4513'
+// Monanimal Character Data
+const MONANIMAL_DATA = {
+    images: [
+        'images/Butterfly2.png',
+        'images/cfbde5.png',
+        'images/Component_23_4.png',
+        'images/IMG_7966.PNG.png',
+        'images/monad_ikan.png'
+    ],
+    size: {
+        width: 24,
+        height: 24
     },
     animation: {
         bounceHeight: 4,
         bounceSpeed: 0.15
     }
 };
+
+// Preload monanimal images
+const MONANIMAL_IMAGES = [];
+MONANIMAL_DATA.images.forEach((src, index) => {
+    MONANIMAL_IMAGES[index] = new Image();
+    MONANIMAL_IMAGES[index].src = src;
+});
 
 // Monad API Integration
 class MonadAPI {
@@ -462,8 +468,8 @@ class Balloon {
     }
 }
 
-// Enhanced LilChog Class
-class LilchogPerson {
+// Enhanced Monanimal Class
+class MonanimalPerson {
     constructor(x, y) {
         this.x = x;
         this.y = y;
@@ -471,7 +477,7 @@ class LilchogPerson {
         this.targetY = y;
         this.originalX = x;
         this.originalY = y;
-        this.size = LILCHOG_SPRITES.body.radius;
+        this.size = MONANIMAL_DATA.size.width;
         this.state = 'waiting';
         this.speed = CONFIG.people.walkSpeed + Math.random() * 1;
         this.animation = Math.random() * Math.PI * 2;
@@ -479,19 +485,8 @@ class LilchogPerson {
         this.bouncePhase = Math.random() * Math.PI * 2;
         this.direction = 1;
         this.waitingSpot = { x: x, y: y };
-        this.bodyColor = this.getRandomBodyColor();
-        this.spikeColor = this.getRandomSpikeColor();
+        this.imageIndex = Math.floor(Math.random() * MONANIMAL_IMAGES.length);
         this.id = Math.random().toString(36).substr(2, 6);
-    }
-
-    getRandomBodyColor() {
-        const colors = ['#F5F5DC', '#FFFACD', '#E6E6FA', '#F0E68C', '#FFB6C1', '#DDA0DD'];
-        return colors[Math.floor(Math.random() * colors.length)];
-    }
-
-    getRandomSpikeColor() {
-        const colors = ['#DEB887', '#D2B48C', '#BC8F8F', '#CD853F', '#A0522D', '#8B7355'];
-        return colors[Math.floor(Math.random() * colors.length)];
     }
 
     findNearestBalloon() {
@@ -524,10 +519,10 @@ class LilchogPerson {
 
     update() {
         this.animation += 0.1;
-        this.bouncePhase += LILCHOG_SPRITES.animation.bounceSpeed;
+        this.bouncePhase += MONANIMAL_DATA.animation.bounceSpeed;
 
         if (this.state === 'waiting') {
-            const bounce = Math.sin(this.bouncePhase) * LILCHOG_SPRITES.animation.bounceHeight;
+            const bounce = Math.sin(this.bouncePhase) * MONANIMAL_DATA.animation.bounceHeight;
             this.y = this.waitingSpot.y + bounce;
 
             // Actively look for balloons
@@ -587,78 +582,37 @@ class LilchogPerson {
         }
     }
 
-    drawLilchog() {
+    drawMonanimal() {
         ctx.save();
-
+        
+        // Apply direction and bouncing effects
+        ctx.translate(this.x, this.y);
         ctx.scale(this.direction, 1);
-        const drawX = this.direction * this.x;
-
-        // Body (hedgehog-like)
-        ctx.fillStyle = this.bodyColor;
-        ctx.beginPath();
-        ctx.arc(drawX, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Enhanced spikes
-        ctx.fillStyle = this.spikeColor;
-        for (let i = 0; i < LILCHOG_SPRITES.body.spikes; i++) {
-            const angle = (i / LILCHOG_SPRITES.body.spikes) * Math.PI * 2;
-            const spikeX = drawX + Math.cos(angle) * (this.size - 2);
-            const spikeY = this.y + Math.sin(angle) * (this.size - 2);
-            
+        
+        // For flying state, add a small rotation
+        if (this.state === 'flying' || this.state === 'boarding') {
+            ctx.rotate(Math.sin(this.animation * 2) * 0.2);
+        }
+        
+        // Draw the monanimal image
+        if (MONANIMAL_IMAGES[this.imageIndex] && MONANIMAL_IMAGES[this.imageIndex].complete) {
+            const imgWidth = MONANIMAL_DATA.size.width;
+            const imgHeight = MONANIMAL_DATA.size.height;
+            ctx.drawImage(
+                MONANIMAL_IMAGES[this.imageIndex],
+                -imgWidth,
+                -imgHeight,
+                imgWidth * 2,
+                imgHeight * 2
+            );
+        } else {
+            // Fallback if image isn't loaded
+            ctx.fillStyle = 'purple';
             ctx.beginPath();
-            ctx.moveTo(spikeX, spikeY);
-            ctx.lineTo(spikeX + Math.cos(angle) * 8, spikeY + Math.sin(angle) * 8);
-            ctx.lineTo(spikeX + Math.cos(angle + 0.4) * 5, spikeY + Math.sin(angle + 0.4) * 5);
-            ctx.closePath();
+            ctx.arc(0, 0, this.size, 0, Math.PI * 2);
             ctx.fill();
         }
-
-        // Face area
-        ctx.fillStyle = '#FFFACD';
-        ctx.beginPath();
-        ctx.arc(drawX, this.y + 2, this.size * 0.6, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Eyes
-        const eyeOffset = 5;
-        ctx.fillStyle = LILCHOG_SPRITES.face.eyeColor;
-        ctx.beginPath();
-        ctx.arc(drawX - eyeOffset, this.y - 2, LILCHOG_SPRITES.face.eyeSize, 0, Math.PI * 2);
-        ctx.arc(drawX + eyeOffset, this.y - 2, LILCHOG_SPRITES.face.eyeSize, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Eye highlights
-        ctx.fillStyle = LILCHOG_SPRITES.face.eyeHighlight;
-        ctx.beginPath();
-        ctx.arc(drawX - eyeOffset + 1, this.y - 3, 1.5, 0, Math.PI * 2);
-        ctx.arc(drawX + eyeOffset + 1, this.y - 3, 1.5, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Cheeks
-        ctx.fillStyle = LILCHOG_SPRITES.face.cheekColor;
-        ctx.globalAlpha = 0.6;
-        ctx.beginPath();
-        ctx.arc(drawX - 10, this.y + 2, 4, 0, Math.PI * 2);
-        ctx.arc(drawX + 10, this.y + 2, 4, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.globalAlpha = 1;
-
-        // Happy expression
-        if (this.state === 'boarding' || this.state === 'flying') {
-            ctx.strokeStyle = LILCHOG_SPRITES.face.smileColor;
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.arc(drawX, this.y + 4, 5, 0.2 * Math.PI, 0.8 * Math.PI);
-            ctx.stroke();
-        }
-
-        // Nose
-        ctx.fillStyle = '#FFB6C1';
-        ctx.beginPath();
-        ctx.arc(drawX, this.y, 2, 0, Math.PI * 2);
-        ctx.fill();
-
+        
         ctx.restore();
     }
 
@@ -669,13 +623,13 @@ class LilchogPerson {
         if (this.state === 'walking' || this.state === 'returning') {
             bounceOffset = Math.sin(this.animation * 8) * 3;
         } else if (this.state === 'waiting') {
-            bounceOffset = Math.sin(this.bouncePhase) * LILCHOG_SPRITES.animation.bounceHeight;
+            bounceOffset = Math.sin(this.bouncePhase) * MONANIMAL_DATA.animation.bounceHeight;
         }
 
         const originalY = this.y;
         this.y += bounceOffset;
         
-        this.drawLilchog();
+        this.drawMonanimal();
         
         this.y = originalY;
     }
@@ -971,13 +925,13 @@ function initGame() {
         });
     }
 
-    // Create initial LilChogs army
+    // Create initial Monanimals
     for (let i = 0; i < 200; i++) {
-        const lilchog = new LilchogPerson(
+        const monanimal = new MonanimalPerson(
             50 + Math.random() * 300,
             CONFIG.canvas.height - 150 + Math.random() * 60
         );
-        gameState.people.push(lilchog);
+        gameState.people.push(monanimal);
     }
 
     // Hide loading screen
@@ -988,7 +942,7 @@ function initGame() {
     setInterval(updateNetworkData, CONFIG.monad.updateInterval);
     setInterval(changeWeather, CONFIG.weather.changeInterval);
     
-    console.log('🎈 Cappadocia Blockchain Adventure initialized with LilChogs!');
+    console.log('🎈 Cappadocia Blockchain Adventure initialized with Monanimals!');
 }
 
 // Network Data Updates
@@ -1021,7 +975,7 @@ function createNewBalloon(blockData) {
     const balloon = new Balloon(x, y, blockData);
     gameState.balloons.push(balloon);
 
-    console.log(`🎈 New balloon created for block ${blockData.blockHeight} (capacity: ${blockData.txCount} lilchogs)`);
+    console.log(`🎈 New balloon created for block ${blockData.blockHeight} (capacity: ${blockData.txCount} monanimals)`);
 }
 
 function updateHUD() {
@@ -1037,7 +991,7 @@ function updateHUD() {
 // Achievement System
 function checkAchievements() {
     const blockCount = gameState.balloons.length;
-    const totalLilchogs = gameState.people.length;
+    const totalMonanimals = gameState.people.length;
     
     if (blockCount === 1 && !gameState.achievements.includes('first_balloon')) {
         showAchievement('🎈 First Flight!', 'Witnessed your first Monad balloon launch');
@@ -1049,9 +1003,9 @@ function checkAchievements() {
         gameState.achievements.push('balloon_explorer');
     }
     
-    if (totalLilchogs >= 100 && !gameState.achievements.includes('lilchog_army')) {
-        showAchievement('🦔 LilChog Army!', 'Attracted 100+ lilchogs to the adventure');
-        gameState.achievements.push('lilchog_army');
+    if (totalMonanimals >= 100 && !gameState.achievements.includes('monanimal_army')) {
+        showAchievement('🐠 Monanimal Army!', 'Attracted 100+ monanimals to the adventure');
+        gameState.achievements.push('monanimal_army');
     }
 }
 
@@ -1111,17 +1065,17 @@ function update() {
         (person.targetBalloon && person.targetBalloon.state !== 'gone')
     );
 
-    // Spawn new lilchogs continuously
+    // Spawn new monanimals continuously
     const shouldSpawn = Math.random() < CONFIG.people.spawnRate * (1 + gameState.networkData.tps / 20);
-    const waitingLilchogs = gameState.people.filter(p => 
+    const waitingMonanimals = gameState.people.filter(p =>
         p.state === 'waiting' || p.state === 'returning').length;
     
-    if (shouldSpawn && waitingLilchogs < 100 && gameState.people.length < CONFIG.people.maxCount) {
-        const lilchog = new LilchogPerson(
+    if (shouldSpawn && waitingMonanimals < 100 && gameState.people.length < CONFIG.people.maxCount) {
+        const monanimal = new MonanimalPerson(
             50 + Math.random() * 300,
             CONFIG.canvas.height - 150 + Math.random() * 60
         );
-        gameState.people.push(lilchog);
+        gameState.people.push(monanimal);
     }
 
     // Update clouds
@@ -1228,7 +1182,7 @@ function drawDebugInfo() {
     
     const debugInfo = [
         `Balloons: ${gameState.balloons.length}`,
-        `LilChogs: ${gameState.people.length}`,
+        `Monanimals: ${gameState.people.length}`,
         `Particles: ${gameState.particles.length}`,
         `Block Height: ${gameState.networkData.blockHeight}`,
         `TPS: ${gameState.networkData.tps.toFixed(2)}`,
@@ -1294,13 +1248,13 @@ function showBalloonDetail(balloon, x, y) {
     info.innerHTML = `
         <strong>Block #${balloon.blockData ? balloon.blockData.blockHeight : 'Loading'}</strong><br><br>
         <strong>Status:</strong> ${statusEmoji[balloon.state] || '⭕'} ${balloon.state}<br>
-        <strong>LilChog Passengers:</strong> ${balloon.passengers.length}/${balloon.blockData ? balloon.blockData.txCount : 'Loading'}<br>
+        <strong>Monanimal Passengers:</strong> ${balloon.passengers.length}/${balloon.blockData ? balloon.blockData.txCount : 'Loading'}<br>
         <strong>Required TXs:</strong> ${balloon.blockData ? balloon.blockData.txCount : 'Loading'}<br>
         <strong>Confirmation Time:</strong> ${confirmationTime}<br>
         <strong>Current Gas Price:</strong> ${gameState.networkData.gasPrice.toFixed(4)} GWei<br>
         ${balloon.blockData ? `<strong>Block Hash:</strong> ${balloon.blockData.blockHash.slice(0, 16)}...<br>` : ''}
         <strong>Monad Network:</strong> Testnet 🟣<br>
-        <br><em>🦔 Each lilchog represents a transaction waiting for block confirmation!<br>
+        <br><em>🐠 Each monanimal represents a transaction waiting for block confirmation!<br>
         💡 Click balloon to destroy it and earn MP tokens!</em>
     `;
     
@@ -1322,16 +1276,16 @@ function togglePause() {
 
 function addRandomTx() {
     if (gameState.people.length < CONFIG.people.maxCount) {
-        const lilchog = new LilchogPerson(
+        const monanimal = new MonanimalPerson(
             50 + Math.random() * 300,
             CONFIG.canvas.height - 150 + Math.random() * 60
         );
-        gameState.people.push(lilchog);
+        gameState.people.push(monanimal);
 
         for (let i = 0; i < 8; i++) {
             gameState.particles.push({
-                x: lilchog.x + Math.random() * 30 - 15,
-                y: lilchog.y - 10,
+                x: monanimal.x + Math.random() * 30 - 15,
+                y: monanimal.y - 10,
                 vx: Math.random() * 4 - 2,
                 vy: Math.random() * 3 + 2,
                 life: 1,
@@ -1339,7 +1293,7 @@ function addRandomTx() {
             });
         }
 
-        console.log('🦔 New lilchog spawned!');
+        console.log('🐠 New monanimal spawned!');
     }
 }
 
@@ -1356,16 +1310,16 @@ function resetGame() {
     gameState.achievements = [];
     gameState.balloonQueue = 0;
     
-    // Create initial lilchogs
+    // Create initial monanimals
     for (let i = 0; i < 200; i++) {
-        const lilchog = new LilchogPerson(
+        const monanimal = new MonanimalPerson(
             50 + Math.random() * 300,
             CONFIG.canvas.height - 150 + Math.random() * 60
         );
-        gameState.people.push(lilchog);
+        gameState.people.push(monanimal);
     }
     
-    showAchievement('🔄 Fresh Start!', 'Adventure reset - new lilchogs ready for balloon rides!');
+    showAchievement('🔄 Fresh Start!', 'Adventure reset - new monanimals ready for balloon rides!');
 }
 
 function toggleSound() {
@@ -1427,7 +1381,7 @@ window.addEventListener('load', () => {
     initGame();
     gameLoop();
     console.log('🎈 Welcome to Cappadocia Blockchain Adventure!');
-    console.log('🦔 Watch lilchogs (transactions) board Monad balloons (blocks)!');
+    console.log('🐠 Watch monanimals (transactions) board Monad balloons (blocks)!');
     console.log('🎯 Click balloons to destroy them and earn MP tokens!');
 });
 
