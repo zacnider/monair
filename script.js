@@ -735,11 +735,11 @@ class Balloon {
                 
                 if (this.y > centerY) {
                     // Phase 1: Rise to center of screen
-                    this.y -= CONFIG.balloons.flySpeed * 1.5;
+                    this.y -= CONFIG.balloons.flySpeed * 3.0;
                     this.x += windEffect * 0.3; // Small horizontal drift from wind
                 } else {
                     // Phase 2: Fly horizontally to the right
-                    this.x += CONFIG.balloons.flySpeed * 2.5;
+                    this.x += CONFIG.balloons.flySpeed * 5.0;
                     this.y += windEffect * 0.5; // Small vertical movement from wind
                 }
                 
