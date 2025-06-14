@@ -8,7 +8,7 @@ const CONFIG = {
         maxCount: 1, // Only one balloon at a time
         launchHeight: 650,
         flySpeed: 0.3, // Much slower balloon rise
-        maxTxPerBalloon: 50,
+        maxTxPerBalloon: 300,
         waitTime: 15000, // Wait longer for passengers
         minPassengerWait: 5000, // Minimum wait time for passengers
         type: 'balloon' // 'balloon' or 'zeppelin'
