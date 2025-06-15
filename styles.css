@@ -1,0 +1,720 @@
+body {
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to bottom, #87CEEB 0%, #E0F6FF 50%, #DDBF94 100%);
+    font-family: 'Arial', sans-serif;
+    overflow: hidden;
+    cursor: crosshair;
+}
+
+#gameCanvas {
+    display: block;
+    margin: 0 auto;
+    border: 3px solid #7C4DFF;
+    border-radius: 15px;
+    box-shadow: 0 15px 40px rgba(124, 77, 255, 0.3);
+    background: linear-gradient(to bottom, #87CEEB 0%, #E0F6FF 40%, #F0E68C 70%, #DDBF94 100%);
+}
+
+.hud {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: rgba(124, 77, 255, 0.95); /* Higher opacity as fallback */
+    color: white;
+    padding: 20px;
+    border-radius: 15px;
+    font-family: 'Courier New', monospace;
+    z-index: 100;
+    -webkit-backdrop-filter: blur(15px);
+    backdrop-filter: blur(15px);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+@supports not ((backdrop-filter: blur(15px)) or (-webkit-backdrop-filter: blur(15px))) {
+    .hud {
+        background: rgba(124, 77, 255, 0.98); /* Even higher opacity when no backdrop-filter support */
+    }
+}
+
+.hud div {
+    margin: 8px 0;
+    font-size: 14px;
+}
+
+.hud-divider {
+    border: 0;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.3);
+    margin: 10px 0;
+}
+
+.controls {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(156, 39, 176, 0.95); /* Higher opacity as fallback */
+    color: white;
+    padding: 20px;
+    border-radius: 15px;
+    z-index: 100;
+    -webkit-backdrop-filter: blur(15px);
+    backdrop-filter: blur(15px);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+@supports not ((backdrop-filter: blur(15px)) or (-webkit-backdrop-filter: blur(15px))) {
+    .controls {
+        background: rgba(156, 39, 176, 0.98); /* Even higher opacity when no backdrop-filter support */
+    }
+}
+
+.controls .sound-toggle {
+    background: linear-gradient(45deg, #FF6B35, #FF4500);
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+}
+
+.controls .sound-toggle:hover {
+    transform: scale(1.1) rotate(10deg);
+    box-shadow: 0 6px 20px rgba(255, 107, 53, 0.5);
+}
+
+.controls button {
+    background: linear-gradient(45deg, #7C4DFF, #9C27B0);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    margin: 8px 5px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(124, 77, 255, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.controls button:hover {
+    background: linear-gradient(45deg, #9C27B0, #7C4DFF);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 8px 25px rgba(124, 77, 255, 0.5);
+}
+
+.controls button:active {
+    transform: translateY(0) scale(0.98);
+}
+
+.controls button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transition: width 0.6s, height 0.6s;
+    transform: translate(-50%, -50%);
+    z-index: 0;
+}
+
+.controls button:active::before {
+    width: 300px;
+    height: 300px;
+}
+
+.info-panel {
+    position: absolute;
+    top: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.9); /* Higher opacity as fallback */
+    color: white;
+    padding: 15px 30px;
+    border-radius: 25px;
+    font-size: 16px;
+    z-index: 100;
+    -webkit-backdrop-filter: blur(15px);
+    backdrop-filter: blur(15px);
+    text-align: center;
+    border: 2px solid rgba(124, 77, 255, 0.3);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+@supports not ((backdrop-filter: blur(15px)) or (-webkit-backdrop-filter: blur(15px))) {
+    .info-panel {
+        background: rgba(0, 0, 0, 0.95); /* Even higher opacity when no backdrop-filter support */
+    }
+}
+
+.footer-info {
+    position: fixed;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(124, 77, 255, 0.95); /* Higher opacity as fallback */
+    color: white;
+    padding: 8px 20px;
+    border-radius: 15px;
+    font-size: 12px;
+    z-index: 1000;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+@supports not ((backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px))) {
+    .footer-info {
+        background: rgba(124, 77, 255, 0.98); /* Even higher opacity when no backdrop-filter support */
+    }
+}
+
+.balloon-detail {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.97); /* Higher opacity as fallback */
+    border: 3px solid #7C4DFF;
+    border-radius: 20px;
+    padding: 25px;
+    max-width: 350px;
+    display: none;
+    z-index: 200;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    font-family: Arial, sans-serif;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+
+@supports not ((backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px))) {
+    .balloon-detail {
+        background: rgba(255, 255, 255, 0.99); /* Even higher opacity when no backdrop-filter support */
+    }
+}
+
+.balloon-detail .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: #ef4444;
+    color: white;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.balloon-detail .close-btn:hover {
+    background: #dc2626;
+    transform: scale(1.1);
+}
+
+.balloon-detail h3 {
+    color: #7C4DFF;
+    margin-top: 0;
+    text-align: center;
+    font-size: 18px;
+}
+
+.balloon-detail::-webkit-scrollbar {
+    width: 8px;
+}
+
+.balloon-detail::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.balloon-detail::-webkit-scrollbar-thumb {
+    background: #7C4DFF;
+    border-radius: 10px;
+}
+
+.balloon-detail::-webkit-scrollbar-thumb:hover {
+    background: #9C27B0;
+}
+
+.achievement {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(45deg, #FFD700, #FFA500, #FF6B35);
+    color: #333;
+    padding: 30px;
+    border-radius: 20px;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    display: none;
+    z-index: 300;
+    animation: achievement-pop 3s ease-in-out;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    border: 3px solid rgba(255, 255, 255, 0.5);
+}
+
+@keyframes achievement-pop {
+    0% { 
+        transform: translate(-50%, -50%) scale(0) rotate(-10deg); 
+        opacity: 0; 
+    }
+    20% { 
+        transform: translate(-50%, -50%) scale(1.2) rotate(5deg); 
+        opacity: 1; 
+    }
+    80% { 
+        transform: translate(-50%, -50%) scale(1) rotate(0deg); 
+        opacity: 1; 
+    }
+    100% { 
+        transform: translate(-50%, -50%) scale(0) rotate(10deg); 
+        opacity: 0; 
+    }
+}
+
+.loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(124, 77, 255, 0.95); /* Higher opacity as fallback */
+    color: white;
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    z-index: 1000;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    -webkit-backdrop-filter: blur(15px);
+    backdrop-filter: blur(15px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+}
+
+@supports not ((backdrop-filter: blur(15px)) or (-webkit-backdrop-filter: blur(15px))) {
+    .loading {
+        background: rgba(124, 77, 255, 0.98); /* Even higher opacity when no backdrop-filter support */
+    }
+}
+
+.loading-spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #FFD700;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 15px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Sound toggle is now part of controls class */
+
+/* Remove slingshot styles */
+.slingshot-container,
+.slingshot,
+.slingshot-base,
+.slingshot-band,
+.projectile,
+.slingshot-info {
+    display: none;
+}
+
+/* Weather Effects */
+.weather-effect {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.rain-drop {
+    position: absolute;
+    width: 2px;
+    height: 15px;
+    background: linear-gradient(to bottom, rgba(173, 216, 230, 0.8), rgba(173, 216, 230, 0.2));
+    animation: rainFall linear infinite;
+    border-radius: 0 0 50% 50%;
+}
+
+.snow-flake {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: white;
+    border-radius: 50%;
+    animation: snowFall linear infinite;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+}
+
+@keyframes rainFall {
+    0% {
+        transform: translateY(-10px) rotate(10deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh) rotate(10deg);
+        opacity: 0;
+    }
+}
+
+@keyframes snowFall {
+    0% {
+        transform: translateY(-10px) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* Game Effects */
+.particle {
+    position: absolute;
+    pointer-events: none;
+    font-size: 20px;
+    z-index: 50;
+    animation: particle-float 2s ease-out forwards;
+}
+
+@keyframes particle-float {
+    0% { 
+        transform: translateY(0) rotate(0deg) scale(1); 
+        opacity: 1; 
+    }
+    50% {
+        transform: translateY(-50px) rotate(180deg) scale(1.2);
+        opacity: 0.8;
+    }
+    100% { 
+        transform: translateY(-120px) rotate(360deg) scale(0.8); 
+        opacity: 0; 
+    }
+}
+
+.magic-particle {
+    position: absolute;
+    pointer-events: none;
+    animation: magic-float 2s ease-out forwards;
+}
+
+@keyframes magic-float {
+    0% {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.3) rotate(720deg) translateY(-100px);
+    }
+}
+
+/* Lilchog Character Animations */
+@keyframes lilchog-bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+@keyframes lilchog-walk {
+    0%, 100% { transform: scaleX(1); }
+    50% { transform: scaleX(-1); }
+}
+
+/* Balloon Glow Effects */
+@keyframes balloon-glow {
+    0%, 100% { 
+        filter: drop-shadow(0 0 10px rgba(124, 77, 255, 0.3));
+    }
+    50% { 
+        filter: drop-shadow(0 0 20px rgba(124, 77, 255, 0.6));
+    }
+}
+
+/* Cloud Movement */
+@keyframes cloud-drift {
+    0% { transform: translateX(-10px); }
+    50% { transform: translateX(10px); }
+    100% { transform: translateX(-10px); }
+}
+
+/* Responsive Design */
+@media (max-width: 1280px) {
+    #gameCanvas {
+        width: 95vw;
+        height: auto;
+    }
+    
+    .hud, .controls {
+        font-size: 12px;
+        padding: 15px;
+    }
+    
+    .controls button {
+        padding: 8px 15px;
+        font-size: 12px;
+    }
+    
+    /* Removed unused slingshot styles */
+}
+
+@media (max-width: 768px) {
+    body {
+        cursor: auto;
+    }
+    
+    .hud {
+        top: 10px;
+        left: 10px;
+        padding: 10px;
+        font-size: 10px;
+    }
+    
+    .controls {
+        top: 10px;
+        right: 10px;
+        padding: 10px;
+    }
+    
+    .controls button {
+        padding: 6px 12px;
+        margin: 3px 2px;
+        font-size: 10px;
+    }
+    
+    .info-panel {
+        bottom: 10px;
+        font-size: 12px;
+        padding: 10px 20px;
+    }
+    
+    .controls .sound-toggle {
+        padding: 10px;
+        font-size: 16px;
+    }
+}
+
+/* Explosion Effects */
+.explosion {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background: radial-gradient(circle, #FFD700 0%, #FF6B35 50%, transparent 100%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 5;
+    animation: explode 0.6s ease-out forwards;
+}
+
+@keyframes explode {
+    0% {
+        transform: scale(0);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(3);
+        opacity: 0;
+    }
+}
+
+.mp-reward {
+    position: absolute;
+    background: linear-gradient(45deg, #10B981, #34D399);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: bold;
+    pointer-events: none;
+    z-index: 5;
+    animation: floatUp 2s ease-out forwards;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+}
+
+@keyframes floatUp {
+    0% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-80px) scale(1.2);
+        opacity: 0;
+    }
+}
+
+/* Crosshair Effect */
+.crosshair {
+    position: fixed;
+    font-size: 24px;
+    color: #FF6B35;
+    pointer-events: none;
+    z-index: 1000;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(255, 107, 53, 0.8);
+    animation: crosshair-pulse 1s infinite;
+}
+
+@keyframes crosshair-pulse {
+    0%, 100% {
+        opacity: 0.8;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+}
+
+/* Transaction and Block Info Panels */
+.tx-info-panel, .block-tx-panel {
+    position: absolute;
+    top: 100px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.97); /* Higher opacity as fallback */
+    border: 3px solid #7C4DFF;
+    border-radius: 20px;
+    padding: 25px;
+    width: 350px;
+    max-height: 500px;
+    overflow-y: auto;
+    display: none;
+    z-index: 200;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    font-family: Arial, sans-serif;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+
+@supports not ((backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px))) {
+    .tx-info-panel, .block-tx-panel {
+        background: rgba(255, 255, 255, 0.99); /* Even higher opacity when no backdrop-filter support */
+    }
+}
+
+/* Scrollbar styles for panels */
+.tx-info-panel::-webkit-scrollbar,
+.block-tx-panel::-webkit-scrollbar {
+    width: 8px;
+}
+
+.tx-info-panel::-webkit-scrollbar-track,
+.block-tx-panel::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.tx-info-panel::-webkit-scrollbar-thumb,
+.block-tx-panel::-webkit-scrollbar-thumb {
+    background: #7C4DFF;
+    border-radius: 10px;
+}
+
+.tx-info-panel::-webkit-scrollbar-thumb:hover,
+.block-tx-panel::-webkit-scrollbar-thumb:hover {
+    background: #9C27B0;
+}
+
+.tx-info-panel h3, .block-tx-panel h3 {
+    color: #7C4DFF;
+    margin-top: 0;
+    text-align: center;
+    font-size: 18px;
+}
+
+.tx-info-panel .close-btn, .block-tx-panel .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: #ef4444;
+    color: white;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.tx-info-panel .close-btn:hover, .block-tx-panel .close-btn:hover {
+    background: #dc2626;
+    transform: scale(1.1);
+}
+
+.tx-type {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    margin-right: 8px;
+}
+
+.tx-type-transfer { background: #10B981; }
+.tx-type-approve { background: #3B82F6; }
+.tx-type-swap { background: #8B5CF6; }
+.tx-type-stake { background: #F59E0B; }
+.tx-type-unstake { background: #EF4444; }
+.tx-type-claim { background: #6366F1; }
+.tx-type-contract { background: #EC4899; }
+
+.explorer-link {
+    display: inline-block;
+    background: linear-gradient(45deg, #7C4DFF, #9C27B0);
+    color: white;
+    text-decoration: none;
+    padding: 8px 15px;
+    border-radius: 15px;
+    margin-top: 10px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.explorer-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(124, 77, 255, 0.4);
+}
+
+.tx-item {
+    background: rgba(240, 240, 240, 0.7);
+    border-radius: 10px;
+    padding: 12px;
+    margin: 8px 0;
+    transition: all 0.2s ease;
+}
+
+.tx-item:hover {
+    background: rgba(240, 240, 240, 0.9);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}

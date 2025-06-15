@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎈 Cappadocia Blockchain Adventure - Monad Visualizer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <canvas id="gameCanvas" width="1200" height="800"></canvas>
+    
+    <!-- Transaction Info Panel -->
+    <div class="tx-info-panel" id="txInfoPanel">
+        <button class="close-btn" onclick="closeTxInfoPanel()">×</button>
+        <h3 id="txInfoTitle">Transaction Details</h3>
+        <div id="txInfoContent"></div>
+    </div>
+    
+    <!-- Block Transactions Panel -->
+    <div class="block-tx-panel" id="blockTxPanel">
+        <button class="close-btn" onclick="closeBlockTxPanel()">×</button>
+        <h3 id="blockTxTitle">Block Transactions</h3>
+        <div id="blockTxContent"></div>
+    </div>
+    
+    <!-- Loading Screen -->
+    <div class="loading" id="loading">
+        <div class="loading-spinner"></div>
+        <div>Connecting to Monad Testnet...</div>
+        <div style="font-size: 12px; margin-top: 10px;">Preparing balloons for launch 🎈</div>
+    </div>
+
+    <!-- HUD Panel -->
+    <div class="hud" id="hud">
+        <div><strong>🎈 Cappadocia Blockchain Adventure</strong></div>
+        <div>Block Height: <span id="blockHeight">Loading...</span></div>
+        <div>TPS: <span id="tps">0</span> (Wind Speed)</div>
+        <div>Gas Price: <span id="gasPrice">0</span> GWei</div>
+        <div>Flying Balloons: <span id="flyingBalloons">0</span></div>
+        <div>Waiting Monanimals: <span id="waitingPeople">0</span></div>
+        <div>Weather: <span id="weather">Clear Skies</span></div>
+    </div>
+
+    <!-- Control Panel -->
+    <div class="controls">
+        <button class="sound-toggle" onclick="toggleSound()" id="soundToggle">🔊</button>
+        <button onclick="togglePause()">🔄 Reset</button>
+        <button onclick="addRandomTx()">🐠 Add Monanimal</button>
+        <button onclick="toggleDebug()">🔍 Debug</button>
+        <button onclick="toggleBalloonType()" id="balloonTypeToggle">🎈 Balloon</button>
+        <button onclick="resetGame()">🔄 Reset</button>
+    </div>
+
+    <!-- Balloon Detail Modal -->
+    <div class="balloon-detail" id="balloonDetail">
+        <button class="close-btn" onclick="closeBalloonDetail()">×</button>
+        <h3>🎈 Monad Hot Air Block Details</h3>
+        <div id="balloonInfo"></div>
+    </div>
+
+    <!-- Achievement Notification -->
+    <div class="achievement" id="achievement">
+        <div id="achievementText"></div>
+    </div>
+
+
+    <!-- Slingshot Control - Removed -->
+
+    <!-- Weather Effects Container -->
+    <div class="weather-effect" id="weatherEffect"></div>
+
+    <!-- Monad Logo SVG (Hidden, used for drawing) -->
+    <svg id="monadLogo" style="display: none;" width="40" height="40" viewBox="0 0 100 100">
+        <defs>
+            <linearGradient id="monadGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#7C4DFF;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#9C27B0;stop-opacity:1" />
+            </linearGradient>
+        </defs>
+        <rect x="20" y="20" width="60" height="60" rx="12" ry="12" fill="url(#monadGradient)" transform="rotate(45 50 50)"/>
+    </svg>
+
+    <script>
+        // Prevent wallet extension conflicts before our main script loads
+        window.addEventListener('error', function(event) {
+            if (event.error && event.error.message && 
+                (event.error.message.includes('ethereum') || 
+                 event.error.message.includes('defineProperty') ||
+                 event.error.message.includes('Cannot set property'))) {
+                event.preventDefault();
+                return true;
+            }
+        });
+        
+        // Suppress wallet extension console spam
+        const originalError = console.error;
+        console.error = function(...args) {
+            const message = args.join(' ');
+            if (!message.includes('Pocket Universe') && 
+                !message.includes('Backpack') && 
+                !message.includes("couldn't override") &&
+                !message.includes('ethereum')) {
+                originalError.apply(console, args);
+            }
+        };
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>
