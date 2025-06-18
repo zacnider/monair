@@ -33,7 +33,7 @@ const CONFIG = {
         gravity: 0.05
     },
     monad: {
-        rpcUrl: 'https://testnet-rpc.monad.xyz',
+        rpcUrl: 'https://100.rpc.hypersync.xyz/dbc82bc7-6a51-4e4e-abd4-0b3194be6a5f',
         chainId: 10143,
         symbol: 'MON',
         explorer: 'https://testnet.monadexplorer.com',
