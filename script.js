@@ -7,7 +7,7 @@ const CONFIG = {
     balloons: {
         maxCount: 6, // Allow multiple balloons for better TPS handling
         launchHeight: 650,
-        flySpeed: 0.5, // Faster movement based on transaction type
+        flySpeed: 0.3, // Faster movement based on transaction type
         maxTxPerBalloon: 100, // Increased capacity for high TPS
         waitTime: 10000, // Reduced wait time for efficiency
         minPassengerWait: 3000, // Faster boarding
