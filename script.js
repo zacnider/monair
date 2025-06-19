@@ -5,7 +5,7 @@ const CONFIG = {
         height: 800
     },
     balloons: {
-        maxCount: 3, // Allow multiple balloons for better TPS handling
+        maxCount: 6, // Allow multiple balloons for better TPS handling
         launchHeight: 650,
         flySpeed: 0.5, // Faster movement based on transaction type
         maxTxPerBalloon: 100, // Increased capacity for high TPS
@@ -53,7 +53,7 @@ const CONFIG = {
         optimizeRendering: true,    // Use optimized rendering techniques
         maxTotalMonanimals: 200,    // Increased for 10k TPS support
         cleanupInterval: 3000,      // More frequent cleanup for stability
-        maxBalloons: 5,             // More balloons for high TPS
+        maxBalloons: 7,             // More balloons for high TPS
         errorRecovery: true,        // Enable automatic error recovery
         maxErrors: 3,               // Maximum errors before restart
         restartDelay: 2000          // Delay before auto-restart
