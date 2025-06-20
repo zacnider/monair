@@ -25,8 +25,8 @@ const CONFIG = {
     people: {
         maxCount: 10000, // Optimize for better performance
         spawnRate: 0.1, // Slower spawn rate for stability
-        walkSpeed: 2.5, // More consistent walking speed
-        returnSpeed: 2.0 // Consistent return speed
+        walkSpeed: 10, // More consistent walking speed
+        returnSpeed: 10 // Consistent return speed
     },
     environment: {
         windStrength: 0.5,
