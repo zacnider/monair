@@ -8,7 +8,7 @@ const CONFIG = {
         maxCount: 6, // Allow multiple balloons for better TPS handling
         launchHeight: 650,
         flySpeed: 0.7, // Faster movement based on transaction type
-        maxTxPerBalloon: 100, // Increased capacity for high TPS
+        maxTxPerBalloon: 300, // Increased capacity for high TPS
         waitTime: 10000, // Reduced wait time for efficiency
         minPassengerWait: 3000, // Faster boarding
         type: 'balloon', // 'balloon' or 'zeppelin'
@@ -23,7 +23,7 @@ const CONFIG = {
         }
     },
     people: {
-        maxCount: 10000, // Optimize for better performance
+        maxCount: 100000, // Optimize for better performance
         spawnRate: 0.1, // Slower spawn rate for stability
         walkSpeed: 10, // More consistent walking speed
         returnSpeed: 10 // Consistent return speed
@@ -48,10 +48,10 @@ const CONFIG = {
         objectPooling: true,        // Reuse objects instead of creating new ones
         cullOffscreen: true,        // Don't update/render objects outside view
         simplifyDistant: false,     // Keep full quality for better visuals
-        maxVisibleMonanimals: 200,  // Increased for higher TPS
+        maxVisibleMonanimals: 500,  // Increased for higher TPS
         maxParticles: 30,           // Increased particle limit
         optimizeRendering: true,    // Use optimized rendering techniques
-        maxTotalMonanimals: 200,    // Increased for 10k TPS support
+        maxTotalMonanimals: 500,    // Increased for 10k TPS support
         cleanupInterval: 3000,      // More frequent cleanup for stability
         maxBalloons: 7,             // More balloons for high TPS
         errorRecovery: true,        // Enable automatic error recovery
