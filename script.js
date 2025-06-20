@@ -7,7 +7,7 @@ const CONFIG = {
     balloons: {
         maxCount: 6, // Allow multiple balloons for better TPS handling
         launchHeight: 650,
-        flySpeed: 0.3, // Faster movement based on transaction type
+        flySpeed: 0.7, // Faster movement based on transaction type
         maxTxPerBalloon: 100, // Increased capacity for high TPS
         waitTime: 10000, // Reduced wait time for efficiency
         minPassengerWait: 3000, // Faster boarding
@@ -37,8 +37,8 @@ const CONFIG = {
         chainId: 10143,
         symbol: 'MON',
         explorer: 'https://testnet.monadexplorer.com',
-        updateInterval: 8000, // 8 seconds - optimized for 10k TPS (every 10 blocks)
-        blocksPerUpdate: 10 // Move balloons every 10 blocks for efficiency
+        updateInterval: 500, // 0,5 seconds - optimized for 10k TPS (every 1 blocks)
+        blocksPerUpdate: 1 // Move balloons every 10 blocks for efficiency
     },
     weather: {
         changeInterval: 30000, // 30 seconds
@@ -48,7 +48,7 @@ const CONFIG = {
         objectPooling: true,        // Reuse objects instead of creating new ones
         cullOffscreen: true,        // Don't update/render objects outside view
         simplifyDistant: false,     // Keep full quality for better visuals
-        maxVisibleMonanimals: 100,  // Increased for higher TPS
+        maxVisibleMonanimals: 200,  // Increased for higher TPS
         maxParticles: 30,           // Increased particle limit
         optimizeRendering: true,    // Use optimized rendering techniques
         maxTotalMonanimals: 200,    // Increased for 10k TPS support
