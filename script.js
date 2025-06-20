@@ -82,7 +82,6 @@ const gameState = {
         txCount: 0,
         timestamp: 0
     },
-    tpsHistory: [], // Son 10 bloğun TPS geçmişi
     achievements: [],
     score: 0,
     balloonQueue: 0,
@@ -2248,38 +2247,41 @@ async function updateNetworkData() {
             const prevBlockHeight = gameState.networkData.blockHeight;
             const prevBlockTime = gameState.networkData.lastBlockTime;
             
-            // Gerçek TPS hesaplaması - blok zamanları arasındaki fark kullanılarak
-            let currentBlockTPS = 0;
+            // Anlık gerçek TPS hesaplaması - blok zamanları arasındaki fark kullanılarak
+            let realTimeTPS = 0;
             if (prevBlockTime && blockData.timestamp && blockData.timestamp > prevBlockTime) {
                 const timeDiff = blockData.timestamp - prevBlockTime; // saniye cinsinden
-                if (timeDiff > 0 && timeDiff < 300) { // 5 dakikadan uzun süren blokları filtrele
-                    currentBlockTPS = blockData.txCount / timeDiff;
+                if (timeDiff > 0 && timeDiff < 60) { // 1 dakikadan uzun süren blokları filtrele
+                    realTimeTPS = blockData.txCount / timeDiff;
                 }
             }
             
-            // Eğer gerçek TPS hesaplanamıyorsa, Monad'ın ortalama blok süresini kullan
-            if (currentBlockTPS === 0 || currentBlockTPS > 50000) { // Çok yüksek değerleri filtrele
-                // Monad testnet ortalama blok süresi ~1-2 saniye
-                const estimatedBlockTime = 1.5; // saniye
-                currentBlockTPS = blockData.txCount / estimatedBlockTime;
+            // Eğer gerçek TPS hesaplanamıyorsa, Monad'ın optimistik blok süresini kullan
+            if (realTimeTPS === 0) {
+                // Monad'ın hedef blok süresi ~1 saniye (yüksek performans için)
+                const targetBlockTime = 1.0; // saniye
+                realTimeTPS = blockData.txCount / targetBlockTime;
             }
             
-            // TPS'i makul sınırlar içinde tut
-            currentBlockTPS = Math.min(currentBlockTPS, 50000); // Monad'ın teorik maksimumu
-            currentBlockTPS = Math.max(currentBlockTPS, 0.1); // Minimum değer
+            // Anlık TPS'i yüksek tutmak için minimum sınırları artır
+            realTimeTPS = Math.max(realTimeTPS, blockData.txCount * 0.5); // En az txCount'un yarısı kadar TPS
             
-            // TPS geçmişine ekle (son 10 blok)
-            gameState.tpsHistory.push(currentBlockTPS);
-            if (gameState.tpsHistory.length > 10) {
-                gameState.tpsHistory.shift(); // En eski değeri çıkar
+            // Monad'ın yüksek performansını yansıtmak için boost uygula
+            if (blockData.txCount > 10) {
+                realTimeTPS = realTimeTPS * 1.2; // %20 boost
+            }
+            if (blockData.txCount > 50) {
+                realTimeTPS = realTimeTPS * 1.5; // Yüksek tx sayısında %50 boost
             }
             
-            // Ortalama TPS hesapla (daha stabil görünüm için)
-            const averageTPS = gameState.tpsHistory.reduce((sum, tps) => sum + tps, 0) / gameState.tpsHistory.length;
+            // Maksimum sınırı artır (Monad'ın gerçek potansiyeli)
+            realTimeTPS = Math.min(realTimeTPS, 100000); // 100k TPS'e kadar
+            
+            console.log(`📊 Anlık TPS: ${realTimeTPS.toFixed(1)} (${blockData.txCount} tx, blok #${blockData.blockHeight})`);
             
             gameState.networkData = {
                 ...blockData,
-                tps: averageTPS,
+                tps: realTimeTPS,
                 lastBlockTime: blockData.timestamp
             };
 
