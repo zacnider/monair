@@ -79,8 +79,10 @@ const gameState = {
         tps: 0,
         gasPrice: 0,
         lastBlockTime: 0,
-        txCount: 0
+        txCount: 0,
+        timestamp: 0
     },
+    tpsHistory: [], // Son 10 bloğun TPS geçmişi
     achievements: [],
     score: 0,
     balloonQueue: 0,
@@ -2244,9 +2246,41 @@ async function updateNetworkData() {
         
         if (blockData) {
             const prevBlockHeight = gameState.networkData.blockHeight;
+            const prevBlockTime = gameState.networkData.lastBlockTime;
+            
+            // Gerçek TPS hesaplaması - blok zamanları arasındaki fark kullanılarak
+            let currentBlockTPS = 0;
+            if (prevBlockTime && blockData.timestamp && blockData.timestamp > prevBlockTime) {
+                const timeDiff = blockData.timestamp - prevBlockTime; // saniye cinsinden
+                if (timeDiff > 0 && timeDiff < 300) { // 5 dakikadan uzun süren blokları filtrele
+                    currentBlockTPS = blockData.txCount / timeDiff;
+                }
+            }
+            
+            // Eğer gerçek TPS hesaplanamıyorsa, Monad'ın ortalama blok süresini kullan
+            if (currentBlockTPS === 0 || currentBlockTPS > 50000) { // Çok yüksek değerleri filtrele
+                // Monad testnet ortalama blok süresi ~1-2 saniye
+                const estimatedBlockTime = 1.5; // saniye
+                currentBlockTPS = blockData.txCount / estimatedBlockTime;
+            }
+            
+            // TPS'i makul sınırlar içinde tut
+            currentBlockTPS = Math.min(currentBlockTPS, 50000); // Monad'ın teorik maksimumu
+            currentBlockTPS = Math.max(currentBlockTPS, 0.1); // Minimum değer
+            
+            // TPS geçmişine ekle (son 10 blok)
+            gameState.tpsHistory.push(currentBlockTPS);
+            if (gameState.tpsHistory.length > 10) {
+                gameState.tpsHistory.shift(); // En eski değeri çıkar
+            }
+            
+            // Ortalama TPS hesapla (daha stabil görünüm için)
+            const averageTPS = gameState.tpsHistory.reduce((sum, tps) => sum + tps, 0) / gameState.tpsHistory.length;
+            
             gameState.networkData = {
                 ...blockData,
-                tps: blockData.txCount / 2
+                tps: averageTPS,
+                lastBlockTime: blockData.timestamp
             };
 
             // Track blocks since last update for optimization
