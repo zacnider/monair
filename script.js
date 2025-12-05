@@ -293,7 +293,7 @@ class MonadAPI {
     
     static getFallbackData(method, params) {
         const currentTime = Math.floor(Date.now() / 1000);
-        const baseBlockHeight = 2847392; // Real Monad testnet block height
+        const baseBlockHeight = 2847392; // Real Monad Mainnet block height
         
         switch (method) {
             case 'eth_blockNumber':
@@ -343,10 +343,10 @@ class MonadAPI {
         return transactions;
     }
     
-    // Fetch explorer data - Simulate real Monad testnet data
+    // Fetch explorer data - Simulate real Monad Mainnet data
     static async getExplorerData() {
         try {
-            // Try real Monad testnet explorer API
+            // Try real Monad Mainnet explorer API
             const response = await fetch(`${CONFIG.monad.explorer}/api/stats`, {
                 method: 'GET',
                 headers: {
