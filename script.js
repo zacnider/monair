@@ -33,10 +33,10 @@ const CONFIG = {
         gravity: 0.05
     },
     monad: {
-        rpcUrl: 'https://testnet-rpc.monad.xyz',
-        chainId: 10143,
+        rpcUrl: 'https://rpc1.monad.xyz',
+        chainId: 143,
         symbol: 'MON',
-        explorer: 'https://testnet.monadexplorer.com',
+        explorer: 'https://monadvision.com',
         updateInterval: 500, // 0,5 seconds - optimized for 10k TPS (every 1 blocks)
         blocksPerUpdate: 1 // Move balloons every 10 blocks for efficiency
     },
