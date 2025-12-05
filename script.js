@@ -3130,7 +3130,7 @@ function showBalloonDetail(balloon) {
         <strong>Confirmation Time:</strong> ${confirmationTime}<br>
         <strong>Current Gas Price:</strong> ${gameState.networkData.gasPrice.toFixed(4)} GWei<br>
         ${balloon.blockData && balloon.blockData.blockHash ? `<strong>Block Hash:</strong> ${balloon.blockData.blockHash.slice(0, 16)}...<br>` : ''}
-        <strong>Network:</strong> Monad Testnet 🟣<br>
+        <strong>Network:</strong> Monad Mainnet 🟣<br>
         <br>
         <button class="explorer-link" onclick="showBlockTxPanel(${balloon.blockData ? balloon.blockData.blockHeight : 0})">
             📋 View Block Transactions
